@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html >
+<head>
+<title>unordered List</title>
+</head>
+<body>
+<ul type="none">
+<li>IAS</li>
+<li>IPS</li>
+<li>IRS</li>
+<li>IFS</li>
+</ul>
+</body>
+</html>
