@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    #search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 300px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      margin-left: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    .recipe {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .recipe img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+    .recipe h2 {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🍴 Recipe Finder</h1>
+  <div id="search-bar">
+    <input type="text" id="foodInput" placeholder="Enter food item (e.g., chicken)">
+    <button onclick="searchRecipe()">Search</button>
+  </div>
+
+  <div id="results"></div>
+
+  <script>
+    async function searchRecipe() {
+      const query = document.getElementById("foodInput").value.trim();
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "<p>Searching...</p>";
+
+      if (!query) {
+        resultsDiv.innerHTML = "<p>Please enter a food item.</p>";
+        return;
+      }
+
+      try {
+        // Fetch meals by ingredient
+        const res = await fetch(https://www.themealdb.com/api/json/v1/1/filter.php?i=${query});
+        const data = await res.json();
+
+        if (!data.meals) {
+          resultsDiv.innerHTML = "<p>No recipes found for that ingredient.</p>";
+          return;
+        }
+
+        resultsDiv.innerHTML = "";
+
+        // For each meal, fetch full details
+        for (let meal of data.meals.slice(0, 5)) { // Limit to 5 recipes
+          const detailRes = await fetch(https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal});
+          const detailData = await detailRes.json();
+          const mealDetails = detailData.meals[0];
+
+          const recipeDiv = document.createElement("div");
+          recipeDiv.className = "recipe";
+          recipeDiv.innerHTML = `
+            <img src="${mealDetails.strMealThumb}" alt="${mealDetails.strMeal}">
+            <h2>${mealDetails.strMeal}</h2>
+            <p><strong>Category:</strong> ${mealDetails.strCategory}</p>
+            <p><strong>Area:</strong> ${mealDetails.strArea}</p>
+            <h3>Instructions:</h3>
+            <p>${mealDetails.strInstructions}</p>
+            <a href="${mealDetails.strYoutube}" target="_blank">▶ Watch Video</a>
+          `;
+
+          resultsDiv.appendChild(recipeDiv);
+        }
+
+      } catch (error) {
+        resultsDiv.innerHTML = "<p>Error fetching recipes. Try again later.</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>
